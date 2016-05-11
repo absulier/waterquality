@@ -30,42 +30,56 @@ for i in df['initial']:
 df['url']=url
 
 
-#Goes to a state and pulls information on each water treatment  facility
-#just goes to first state in database for now
-url=df['url'][0]
+#defining a function that will interate through a dataframe's index to get links to pages
+#each page has information on all the water treatment plants
+#aggreagates information for treatment plants and returns dataframe with all info
+def treatmentplants(frame):
+    #build an empty master dataframe
+    fulldata=pd.DataFrame(columns = ['wid','links','county','city','state','population','watertype','activity'])
+    #loops over the index of the data frame
+    for index in frame.index:
 
-#reads url for the state that has list of treatment plants
-page=urllib.urlopen(url).read()
-soup = BeautifulSoup(page, "html.parser")
+        #reads url for the state that has list of treatment plants
+        page=urllib.urlopen(df['url'][index]).read()
+        soup = BeautifulSoup(page, "html.parser")
 
-#creates a list of info for each treatment plant, info still needs to be parsed
-plants=[]
-for item in soup.find('table').findAll('tr'):
-    plants.append(item.findAll('td'))
-#plants list has one item that doesnt contain info, so just delete it
-del plants[0]
+        #creates a list of info for each treatment plant, info still needs to be parsed
+        plants=[]
+        for item in soup.find('table').findAll('tr'):
+            plants.append(item.findAll('td'))
+        #plants list has one item that doesnt contain info, so just delete it
+        del plants[0]
 
-#parses information and places the info into lists
-links,county,city,population,watertype,activity,wid,state= [],[],[],[],[],[],[],[]
-for i in plants:
-    links.append ( (i[0].find('a')['href']) )
-    county.append( (i[1].renderContents()) )
-    city.append ( (i[2].renderContents()) )
-    population.append( (i[3].renderContents()) )
-    watertype.append( (i[4].renderContents()) )
-    activity.append( (i[5].renderContents()) )
-    wid.append ( (i[6].renderContents().replace('<center>','').replace('</center>','')) )
-    state.append('STATE')
+        #parses information and places the info into lists, some data on site isnt listed consistently
+        #must check that the data is stored in table in this format (length = 7) or else incorrectly
+        #stored data breaks code. Should only leave out a few plants. (Code with outcheck doesnt break till florida)
+        links,county,city,population,watertype,activity,wid,state= [],[],[],[],[],[],[],[]
+        for i in plants:
+            if len(i)==7:
+                links.append ( (i[0].find('a')['href']) )
+                county.append( (i[1].renderContents()) )
+                city.append ( (i[2].renderContents()) )
+                population.append( (i[3].renderContents()) )
+                watertype.append( (i[4].renderContents()) )
+                activity.append( (i[5].renderContents()) )
+                wid.append ( (i[6].renderContents().replace('<center>','').replace('</center>','')) )
+                state.append(df['initial'][index])
 
-#puts those lists into a dataframe
-df2 = pd.DataFrame()
-df2['wid']=wid
-df2['links']=links
-df2['county']=county
-df2['city']=city
-df2['state']=state
-df2['population']=population
-df2['watertype']=watertype
-df2['activity']=activity
+        #puts those lists into a dataframe
+        df2 = pd.DataFrame()
+        df2['wid']=wid
+        df2['links']=links
+        df2['county']=county
+        df2['city']=city
+        df2['state']=state
+        df2['population']=population
+        df2['watertype']=watertype
+        df2['activity']=activity
+        #puts information for that state into the master dataframe, then prints
+        #to a csv file. Purposefully prints everytime it completes a state 
+        fulldata= pd.concat([fulldata, df2])
+        pd.DataFrame.to_csv(fulldata,"SDWISUS_US.csv")
+    return fulldata
 
-df2
+df
+master = treatmentplants(df)
