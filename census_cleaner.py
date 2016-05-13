@@ -1,10 +1,19 @@
 #set up environemnt
 import pandas as pd
 
-#read in the first dataset, rename columns
+#read in the race dataset, rename columns
 df = pd.read_csv("censusdem.csv")
 df= df.drop(['Unnamed: 1'], axis=1)
 df.columns=['county','total_dem','white','black','native','asian','islander','twoplus']
+
+#reds in hispanic dataset (census counts hispanic differenly than other races, so downloaded seperately)
+#merges in hispanic number
+hisp=pd.read_csv('hispanic.csv')
+hisp.columns=['county','hispanic']
+len(df)
+len(hisp)
+df= df.merge(hisp, how='outer',on='county')
+df=df.dropna()
 
 #split the counties into county and state
 county,state=[],[] #empty lists to put county and state into
@@ -35,6 +44,7 @@ df.native=df.native.apply(numclean)
 df.asian=df.asian.apply(numclean)
 df.islander=df.islander.apply(numclean)
 df.twoplus=df.twoplus.apply(numclean)
+df.hispanic=df.hispanic.apply(numclean)
 
 #apply the percentage function
 df['per_white']=percentage(df.white)
@@ -43,6 +53,7 @@ df['per_native']=percentage(df.native)
 df['per_asian']=percentage(df.asian)
 df['per_islander']=percentage(df.islander)
 df['per_twoplus']=percentage(df.twoplus)
+df['per_hispanic']=percentage(df.hispanic)
 
 #read in new dataset, put in df, renames columns, drop extra rows
 df2 = pd.read_csv("censusinc.csv")
