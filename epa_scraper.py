@@ -35,7 +35,7 @@ df['url']=url
 #aggreagates information for treatment plants and returns dataframe with all info
 def treatmentplants(frame):
     #build an empty master dataframe
-    fulldata=pd.DataFrame(columns = ['wid','links','county','city','state','population','watertype','activity'])
+    fulldata=pd.DataFrame(columns = ['wid','links','county','city','state','population','watertype'])
     #loops over the index of the data frame
     for index in frame.index:
 
@@ -74,9 +74,9 @@ def treatmentplants(frame):
         df2['population']=population
         df2['watertype']=watertype
         #puts information for that state into the master dataframe, then prints
-        #to a csv file. Purposefully prints everytime it completes a state
+        #to a csv file once done looping.
         fulldata= pd.concat([fulldata, df2])
-        pd.DataFrame.to_csv(fulldata,"SDWISUS_US.csv")
+    pd.DataFrame.to_csv(fulldata,"sdwis.csv")
     return fulldata
 
 master = treatmentplants(df)
