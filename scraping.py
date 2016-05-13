@@ -53,7 +53,7 @@ def treatmentplants(frame):
         #parses information and places the info into lists, some data on site isnt listed consistently
         #must check that the data is stored in table in this format (length = 7) or else incorrectly
         #stored data breaks code. Should only leave out a few plants. (Code with outcheck doesnt break till florida)
-        links,county,city,population,watertype,activity,wid,state= [],[],[],[],[],[],[],[]
+        links,county,city,population,watertype,wid,state= [],[],[],[],[],[],[]
         for i in plants:
             if len(i)==7:
                 links.append ( (i[0].find('a')['href']) )
@@ -61,7 +61,6 @@ def treatmentplants(frame):
                 city.append ( (i[2].renderContents()) )
                 population.append( (i[3].renderContents()) )
                 watertype.append( (i[4].renderContents()) )
-                activity.append( (i[5].renderContents()) )
                 wid.append ( (i[6].renderContents().replace('<center>','').replace('</center>','')) )
                 state.append(df['initial'][index])
 
@@ -74,9 +73,8 @@ def treatmentplants(frame):
         df2['state']=state
         df2['population']=population
         df2['watertype']=watertype
-        df2['activity']=activity
         #puts information for that state into the master dataframe, then prints
-        #to a csv file. Purposefully prints everytime it completes a state 
+        #to a csv file. Purposefully prints everytime it completes a state
         fulldata= pd.concat([fulldata, df2])
         pd.DataFrame.to_csv(fulldata,"SDWISUS_US.csv")
     return fulldata
