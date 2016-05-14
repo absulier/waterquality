@@ -8,15 +8,23 @@ url = 'https://oaspub.epa.gov/enviro/sdw_report_v3.first_table?pws_id=DC0000007&
 page=urllib.urlopen(url).read()
 soup = BeautifulSoup(page, "html.parser")
 
-#goes into the page and fund the tables of health related violations 
+#goes into the page and fund the tables of health related violations
+allhvio=[]
+allmrvio=[]
 for table in soup.findAll('table', {'class':'result2'}):
     count=0
     for item in table.findAll('th'):
         count+=1
     if count == 6:
-        print table
-        print "======"
+        hvio=[]
+        for item in table.findAll('td'):
+            hvio.append(item.renderContents())
+        allhvio.append(hvio)
+    if count == 5:
+        mrvio=[]
+        for item in table.findAll('td'):
+            mrvio.append(item.renderContents())
+        allmrvio.append(mrvio)
 
-
-    #for item in table.findAll('td'):
-    #    print item
+dfh=pd.DataFrame(allhvio,columns=['vio_type','date_begin','date_end','water_rule','analytics','vio_id'])
+dfmr=pd.DataFrame(allmrvio,columns=['vio_type','date_begin','date_end','water_rule','vio_id'])
