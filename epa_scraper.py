@@ -73,10 +73,18 @@ def treatmentplants(frame):
         df2['state']=state
         df2['population']=population
         df2['watertype']=watertype
-        #puts information for that state into the master dataframe, then prints
-        #to a csv file once done looping.
+        #puts information for that state into the master dataframe
         fulldata= pd.concat([fulldata, df2])
-    pd.DataFrame.to_csv(fulldata,"sdwis.csv")
     return fulldata
 
-master = treatmentplants(df)
+#runs function and then assigns the values to dataframe swdis
+sdwis= treatmentplants(df)
+
+#cleans the links so that they can be used for the next phase of scraping
+new_links=[]
+for index in sdwis.index:
+    new_links.append(sdwis.links[index].replace('\r\n1f41\r\n',''))
+sdwis.links=new_links
+
+#prints final dataframe
+pd.DataFrame.to_csv(fulldata,"sdwis.csv")

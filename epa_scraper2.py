@@ -2,8 +2,10 @@
 import urllib
 import pandas as pd
 from bs4 import BeautifulSoup
+from sys import setrecursionlimit as srl
+srl(500000)
 
-sdwis=pd.read_csv('dctest.csv')
+sdwis=pd.read_csv('sdwis.csv')
 #function takes an index from the dataframe of water treatment plants
 #uses that index to find the wid and link to page on violations
 #creats two dataframes of health violations and reporting violations
@@ -40,11 +42,13 @@ def viodata(index):
 
 allhealth=pd.DataFrame(columns=['wid','vio_type','date_begin','date_end','water_rule','analytics','vio_id'])
 allreporting=pd.DataFrame(columns=['wid','vio_type','date_begin','date_end','water_rule','vio_id'])
+
 for i in sdwis.index:
+    print i
     health,reporting=viodata(i)
     allhealth=pd.concat([allhealth,health])
     allreporting=pd.concat([allreporting,reporting])
 
 
-allhealth
-allreporting
+pd.DataFrame.to_csv(allhealth,"health_violations.csv")
+pd.DataFrame.to_csv(allreporting,"reporting_violations.csv")
