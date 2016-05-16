@@ -87,4 +87,4 @@ for index in sdwis.index:
 sdwis.links=new_links
 
 #prints final dataframe
-pd.DataFrame.to_csv(fulldata,"sdwis.csv")
+pd.DataFrame.to_csv(sdwis,"sdwis.csv")
