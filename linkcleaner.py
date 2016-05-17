@@ -1,9 +1,14 @@
 import pandas as pd
 sdwis=pd.read_csv('sdwis.csv')
-sdwis.links[2164]
+sdwis=sdwis.drop(['Unnamed: 0'], axis=1)
 
-for index in sdwis.index:
-    print index
-    sdwis.links[index]=sdwis.links[index].replace('e\r\n1f41\r\npa','epa')
+for i in sdwis.index:
+    sdwis.wid[i]=sdwis.wid[i].replace('1f41','').replace('\r\n','')
+    sdwis.links[i]=sdwis.links[i].replace('1f41','').replace('\r\n','')
+    sdwis.county[i]=sdwis.county[i].replace('1f41','').replace('\r\n','')
+    sdwis.city[i]=sdwis.city[i].replace('1f41','').replace('\r\n','')
+    sdwis.state[i]=sdwis.state[i].replace('1f41','').replace('\r\n','')
+    sdwis.population[i]=sdwis.population[i].replace('1f41','').replace('\r\n','')
+    sdwis.watertype[i]=sdwis.watertype[i].replace('1f41','').replace('\r\n','')
 
-sdwis.links[2164]
+pd.DataFrame.to_csv(sdwis,"sdwis_clean.csv")

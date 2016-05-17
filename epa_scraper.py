@@ -80,11 +80,5 @@ def treatmentplants(frame):
 #runs function and then assigns the values to dataframe swdis
 sdwis= treatmentplants(df)
 
-#cleans the links so that they can be used for the next phase of scraping
-new_links=[]
-for index in sdwis.index:
-    new_links.append(sdwis.links[index].replace('\r\n1f41\r\n',''))
-sdwis.links=new_links
-
-#prints final dataframe
+#prints
 pd.DataFrame.to_csv(sdwis,"sdwis.csv")

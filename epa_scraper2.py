@@ -40,15 +40,14 @@ def viodata(index):
 
     return dfh,dfmr
 
-allhealth=pd.DataFrame(columns=['wid','vio_type','date_begin','date_end','water_rule','analytics','vio_id'])
-allreporting=pd.DataFrame(columns=['wid','vio_type','date_begin','date_end','water_rule','vio_id'])
+allhealth=pd.DataFrame(allhvio,columns=['wid','vio_type','date_begin','date_end','water_rule','analytics','vio_id'])
+allreporting=pd.DataFrame(allmrvio,columns=['wid','vio_type','date_begin','date_end','water_rule','vio_id'])
 
 for i in sdwis.index:
     print i
     health,reporting=viodata(i)
     allhealth=pd.concat([allhealth,health])
     allreporting=pd.concat([allreporting,reporting])
-
 
 pd.DataFrame.to_csv(allhealth,"health_violations.csv")
 pd.DataFrame.to_csv(allreporting,"reporting_violations.csv")
