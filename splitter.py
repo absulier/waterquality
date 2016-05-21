@@ -1,3 +1,6 @@
+#File is too big to run all at once, splits file into small files so I can run
+#in chunks
+
 import pandas as pd
 from sklearn.cross_validation import train_test_split as tts
 
