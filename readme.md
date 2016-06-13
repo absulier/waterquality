@@ -11,9 +11,9 @@ violations in their drinking water.
 Full data set is too large to push to github.
 To compile full data set:
 
-1) In "EPA" directory, run 'vio_cat.py'
-2) In "census" directory, run 'census_cleaner.py'
-3) In main directory, run 'data_compile.py'
+1) In "EPA" directory, run 'vio_cat.py'  
+2) In "census" directory, run 'census_cleaner.py'  
+3) In main directory, run 'data_compile.py'  
 
 These steps will print 3 CSV files to the local directory housing the git
 repository of this project.
