@@ -98,4 +98,4 @@ per_inc.columns=['per_10Kdown','per_10K15K','per_15K20K','per_20K25K','per_25K30
 inc
 per_inc
 
-pd.DataFrame.to_csv(census,"census.csv")
+pd.DataFrame.to_csv(census,"../../census.csv",index=False)

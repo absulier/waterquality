@@ -20,13 +20,15 @@ df2 = df2.agg({'vio_class': np.count_nonzero,
                 'per_200Kup':lambda x: x.iloc[0]
                 }).dropna()
 
-df2
+df2.head()
 y=df2.vio_class
 y.mean()
 y.median()
 
-x=df2.per_200Kup
+x=df2.per_white
 fit = np.polyfit(x, y, deg=1)
 plt.plot(x, fit[0] * x + fit[1], color='red')
 #plt.scatter(x, y)
 plt.show()
+
+df.head()

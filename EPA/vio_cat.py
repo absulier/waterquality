@@ -73,4 +73,4 @@ len(sdwis)
 len(violations.drop_duplicates())
 violations=violations.merge(sdwis,how='outer',on='wid').drop_duplicates().reset_index(drop=True)
 
-pd.DataFrame.to_csv(violations,"../violations.csv")
+pd.DataFrame.to_csv(violations,"../../violations.csv",index=False)
