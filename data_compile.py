@@ -19,4 +19,4 @@ census.head()
 vio.county=vio.county.apply(lower)
 vio=vio.merge(census,how='left',on=['state','county']).reset_index(drop=True)
 
-pd.DataFrame.to_csv(vio,"../vio_full.csv")
+pd.DataFrame.to_csv(vio,"../vio_full.csv",index=False)
