@@ -87,15 +87,18 @@ census.columns
 
 inc=census[['total_inc','10Kdown','10K15K','15K20K','20K25K','25K30K','30K35K','35K40K','40K45K','45K50K','50K60K','60K75K','75K100K','100K125K','125K150K','150K200K','200Kup']]
 
-
 def fun_per_inc(column):
+    new=[]
     for index in inc.index:
-        inc[column][index]=100*inc[column][index]/inc.total_inc[index]
+        new.append(100*inc[column][index]/inc.total_inc[index])
+    inc[column]=new
 
+for column in inc.drop('total_inc',axis=1).columns:
+    fun_per_inc(column)
 
 per_inc=inc.drop('total_inc',axis=1)
 per_inc.columns=['per_10Kdown','per_10K15K','per_15K20K','per_20K25K','per_25K30K','per_30K35K','per_35K40K','per_40K45K','per_45K50K','per_50K60K','per_60K75K','per_75K100K','per_100K125K','per_125K150K','per_150K200K','per_200Kup']
-inc
-per_inc
+
+census=census.merge(per_inc, left_index=True, right_index=True)
 
 pd.DataFrame.to_csv(census,"../../census.csv",index=False)

@@ -3,9 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
 
-df=pd.read_csv('vio_full.csv',low_memory=False).drop('Unnamed: 0',axis=1)
-
-df.columns
+df=pd.read_csv('../vio_full.csv',low_memory=False)
 
 df2 = df[df.vio_class=='health'].groupby(by=["wid"], as_index=False)
 df2 = df2.agg({'vio_class': np.count_nonzero,
@@ -30,5 +28,3 @@ fit = np.polyfit(x, y, deg=1)
 plt.plot(x, fit[0] * x + fit[1], color='red')
 #plt.scatter(x, y)
 plt.show()
-
-df.head()
