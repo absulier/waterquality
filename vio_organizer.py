@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import warnings
 import math
+import warnings
 warnings.filterwarnings("ignore")
 
 df=pd.read_csv('../violations.csv', low_memory=False)
@@ -205,4 +205,4 @@ for i in df.columns:
 
 df1.head()
 
-pd.DataFrame.to_csv(df1,'vio_org.csv')
+pd.DataFrame.to_csv(df1,'vio_org.csv',index=False)
