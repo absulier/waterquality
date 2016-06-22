@@ -5,7 +5,7 @@ import numpy as np
 
 #read in data (drop unecessary columns, drop 2016 because tryin w/ test for 2015)
 #also wont need the reporting violations for 2015
-df=pd.read_csv('vio_org.csv').drop(['wid','2016h','2016r','2015r'],axis=1).dropna()
+df=pd.read_csv('../vio_org.csv').drop(['wid','2016h','2016r','2015r'],axis=1).dropna()
 
 #turn 2015 into a binary for testing
 _2015=[]
