@@ -54,4 +54,4 @@ def nan_to_0 (x):
 for x in df.columns:
     df[x]=df[x].apply(nan_to_0)
 
-pd.DataFrame.to_csv(df, '../fulldata_w_census.csv',index=False)
+pd.DataFrame.to_csv(df, '../fulltest_w_census.csv',index=False)
