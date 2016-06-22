@@ -96,6 +96,7 @@ for i in date.date_begin:
         y_b.append('---')
         m_b.append('---')
         d_b.append('---')
+
 #does the same parse, but for the end date
 y_e=[]
 m_e=[]
@@ -130,9 +131,8 @@ date=date.merge(conve, how='left', on='months').drop('months',axis=1)
 date=date.rename(columns={'num':'m_e'})
 date['d_e']=d_e
 
-date
-
-#finds the lengths of violations
+#finds the lengths of violations, puts that into dataframe,
+#then deletes date and other variables that were used to construct features
 length=[]
 for i in date.index:
     if len(date.y_b[i])==4 and len(date.y_e[i])==4:
@@ -142,55 +142,39 @@ for i in date.index:
         length.append(gap.days)
     else:
         length.append('---')
-
 df['length']=length
-
 df=df.drop(['date_begin','date_end','vio_id','city','vio_type','water_rule'],axis=1)
 df=df.merge(pd.get_dummies(df.vio_class),how='left',left_index=True,right_index=True).drop('vio_class',axis=1)
 
-
+#gets rid of '---' and turns into NaN so we can reorganize
 def to_nan(x):
     if x == '---':
         return np.nan
     else:
         return x
-
 for i in df.columns:
     df[i]=df[i].apply(to_nan)
 
+#turns all analytics values to floats
 to_float = lambda x : float(x)
 df.analytics=df.analytics.apply(to_float)
 
-df1=df.groupby(by=['wid'],as_index=False)
-df1=df1.agg({'analytics':np.mean,
-            'county':lambda x: x.iloc[0],
-            'state':lambda x: x.iloc[0],
-            'population':lambda x: x.iloc[0],
-            'watertype':lambda x: x.iloc[0],
-            '2006':np.sum,
-            '2007':np.sum,
-            '2008':np.sum,
-            '2009':np.sum,
-            '2010':np.sum,
-            '2011':np.sum,
-            '2012':np.sum,
-            '2013':np.sum,
-            '2014':np.sum,
-            '2015':np.sum,
-            '2016':np.sum,
-            'unknown/old':np.sum,
-            'lead':np.sum,
-            'e_coli':np.sum,
-            'coliform':np.sum,
-            'length':np.mean,
-            'health':np.sum,
-            'reporting':np.sum
-            })
+#seperating out health and reporting violations
+dfhealth=df[['health','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','unknown/old']]
+#health
+dfh=dfhealth[dfhealth['health']==1].drop('health',axis=1)
+dfh.columns=['2006h','2007h','2008h','2009h','2010h','2011h','2012h','2013h','2014h','2015h','2016h','unknown/oldh']
+df=df.merge(dfh, how='left', left_index=True, right_index=True)
 
-df1=df1[['wid','state','county','population','watertype','health','reporting',
-    'length','analytics','lead','e_coli','coliform','2006','2007','2008','2009',
-    '2010','2011','2012','2013','2014','2015','2016','unknown/old']]
+#reporting
+dfr=dfhealth[dfhealth['health']==0].drop('health',axis=1)
+dfr.columns=['2006r','2007r','2008r','2009r','2010r','2011r','2012r','2013r','2014r','2015r','2016r','unknown/oldr']
+df=df.merge(dfr, how='left', left_index=True, right_index=True)
 
+#get rid of original years column
+df=df.drop(['2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','unknown/old'],axis=1)
+
+#Drop null values
 def nan_0(x):
     if isinstance(x,float):
         if math.isnan(x):
@@ -201,8 +185,14 @@ def nan_0(x):
         return x
 
 for i in df.columns:
-    df1[i]=df1[i].apply(nan_0)
+    df[i]=df[i].apply(nan_0)
 
-df1.head()
+#reorder columns
+df=df[['wid','state','county','population','watertype','length','analytics',
+    'lead','e_coli','coliform',
+    '2006r','2007r','2008r','2009r','2010r','2011r','2012r','2013r','2014r',
+    '2015r','2016r','unknown/oldr',
+    '2006h','2007h','2008h','2009h','2010h','2011h','2012h','2013h','2014h',
+    '2015h','2016h','unknown/oldh']]
 
-pd.DataFrame.to_csv(df1,'vio_org.csv',index=False)
+pd.DataFrame.to_csv(df,'../vio_org.csv',index=False)
