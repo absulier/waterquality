@@ -6,9 +6,8 @@ import math
 
 #Reads in violations
 df=pd.read_csv('../vio_org.csv')
-df=df[df['2016h']!=1][df['2016r']!=1][df['2015r']!=1][df['2015h']!=1]
-df=df.drop(['2015r','2015h','2016r','2016h'],axis=1)
-len(df)
+df=df[df['2016h']!=1][df['2016r']!=1]
+df=df.drop(['2016r','2016h'],axis=1)
 
 #Reads in all wids and creates an 'ghost' violation for each facility
 #This way, facilities with no violations will still show up in final dataframe,
@@ -56,6 +55,7 @@ df = df.agg({'state':lambda x: x.iloc[0],
                 '2012r':np.sum,
                 '2013r':np.sum,
                 '2014r':np.sum,
+                '2015r':np.sum,
                 'unknown/oldr':np.sum,
                 '2006h':np.sum,
                 '2007h':np.sum,
@@ -66,27 +66,29 @@ df = df.agg({'state':lambda x: x.iloc[0],
                 '2012h':np.sum,
                 '2013h':np.sum,
                 '2014h':np.sum,
+                '2015h':np.sum,
                 'unknown/oldh':np.sum })
+
 #reorganize columns
 df=df[['wid','state','county','population','watertype','length','analytics',
     'lead','e_coli','coliform',
-    '2006r','2007r','2008r','2009r','2010r','2011r','2012r','2013r','2014r','unknown/oldr',
-    '2006h','2007h','2008h','2009h','2010h','2011h','2012h','2013h','2014h','unknown/oldh']]
+    '2006r','2007r','2008r','2009r','2010r','2011r','2012r','2013r','2014r','2015r','unknown/oldr',
+    '2006h','2007h','2008h','2009h','2010h','2011h','2012h','2013h','2014h','2015h','unknown/oldh']]
+
+#adding 2006 to old counts, since model will only be trained on past 9 years
+oldsumh,oldsumr=[],[]
+for i in df.index:
+    oldsumh.append(df['2006h'][i]+df['unknown/oldh'][i])
+    oldsumr.append(df['2006r'][i]+df['unknown/oldr'][i])
+df['unknown/oldh']=oldsumh
+df['unknown/oldr']=oldsumr
+df=df.drop(['2006h','2006r'],axis=1)
 
 #rename columns
 df.columns=[['wid','state','county','population','watertype','length','analytics',
     'lead','e_coli','coliform',
     '9r','8r','7r','6r','5r','4r','3r','2r','1r','unknown/oldr',
     '9h','8h','7h','6h','5h','4h','3h','2h','1h','unknown/oldh']]
-
-
-#read in target information
-target=pd.read_csv('../vio_org.csv')[['wid','2015h']]
-#aggregate by wid and get binary for if facility had a violation that year
-target = target.groupby(by=["wid"], as_index=False)
-target = target.agg({'2015h':max})
-#merge onto the full df
-df=df.merge(target, how='left',on='wid')
 
 #merge in census
 #lower case county
@@ -113,10 +115,8 @@ def to_int(x):
 df.population=df.population.apply(to_int)
 
 #get score for watertype
-df2 = df.groupby(by=["watertype"], as_index=False)
-df2 = df2.agg({'2015h': np.mean,})
-df.watertype=df.merge(df2,on='watertype',how='left')['2015h_y']
-pd.DataFrame.to_csv(df2, 'watertype_score.csv',index=False)
+waterscore = pd.read_csv('watertype_score.csv')
+df.watertype=df.merge(waterscore,on='watertype',how='left')['2015h']
 
 #Turns nan back to zero
 def tozero(x):
@@ -127,5 +127,5 @@ def tozero(x):
 for i in df.columns:
     df[i]=df[i].apply(tozero)
 
-#print
-pd.DataFrame.to_csv(df,'../traintest2015.csv',index=False)
+#print predict csv
+pd.DataFrame.to_csv(df,'../predict2016.csv',index=False)
