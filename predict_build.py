@@ -127,5 +127,50 @@ def tozero(x):
 for i in df.columns:
     df[i]=df[i].apply(tozero)
 
+#dropping redundant demographic income information
+df=df.drop(['10Kdown','10K15K','15K20K','20K25K','25K30K','30K35K','35K40K','40K45K',
+        '45K50K','50K60K','60K75K','75K100K','100K125K','125K150K','150K200K','200Kup'],axis=1)
+
+#dropping redudant demographic race information
+df=df.drop(['white','black','native','asian','islander','twoplus','hispanic'],axis=1)
+
+per_lowincome=[]
+for i in df.index:
+    per_lowincome.append(df.per_10Kdown[i]+df.per_10K15K[i]+df.per_15K20K[i]+df.per_20K25K[i])
+df['per_lowincome']=per_lowincome
+
+per_highincome=[]
+for i in df.index:
+    per_highincome.append(df.per_100K125K[i]+df.per_125K150K[i]+df.per_150K200K[i]+df.per_200Kup[i])
+df['per_highincome']=per_highincome
+
+#drop seperate categories of income data, now reduced to just low income/highincome
+df=df.drop(['per_10Kdown','per_10K15K','per_15K20K','per_20K25K','per_25K30K','per_30K35K','per_35K40K','per_40K45K',
+        'per_45K50K','per_50K60K','per_60K75K','per_75K100K','per_100K125K','per_125K150K','per_150K200K','per_200Kup',
+        'total_inc'],
+        axis=1)
+
+# #blocked out because appears to be less effective then having race data
+# #figures out a 'percentage' of individuals who are not part of the
+# #racial majority of the county. does this because overall, more diverse counties
+# #were shown to have higher problems with water violations across races
+# #Note: due to the way the census counts hispanics, hispanic indivuals are double counted
+# #so the 'percentage not in the majority' isn't techniqually correct and may be over 100%
+# per_diverse=[]
+# for i in df.index:
+#     perc=[df.per_white[i],df.per_black[i],df.per_native[i],df.per_asian[i],
+#     df.per_islander[i],df.per_twoplus[i],df.per_hispanic[i]]
+#     perc.sort()
+#     perc=perc[0:6]
+#     diverse=sum(perc)
+#     per_diverse.append(diverse)
+#
+# df['per_diverse']=per_diverse
+#
+# df=df.drop(['per_white','per_black','per_native','per_asian','per_islander',
+#             'per_twoplus','per_hispanic'],axis=1)
+#
+df=df.rename(columns={'total_dem':'county_pop'})
+
 #print predict csv
 pd.DataFrame.to_csv(df,'../predict2016.csv',index=False)
